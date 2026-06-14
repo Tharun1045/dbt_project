@@ -1,0 +1,44 @@
+resources:
+  jobs:
+    pyspark_lakehouse_pipeline:
+      name: pyspark-lakehouse-pipeline
+      tasks:
+        - task_key: ingest_raw
+          existing_cluster_id: ${var.existing_cluster_id}
+          spark_python_task:
+            python_file: ${workspace.file_path}/pyspark/jobs/01_ingest_raw_nyc_taxi.py
+            parameters:
+              - --catalog
+              - ${var.databricks_catalog}
+              - --raw-file-landing-path
+              - ${var.raw_file_landing_path}
+
+        - task_key: build_base
+          depends_on:
+            - task_key: ingest_raw
+          existing_cluster_id: ${var.existing_cluster_id}
+          spark_python_task:
+            python_file: ${workspace.file_path}/pyspark/jobs/02_build_base_taxi_trips.py
+            parameters:
+              - --catalog
+              - ${var.databricks_catalog}
+
+        - task_key: build_curated
+          depends_on:
+            - task_key: build_base
+          existing_cluster_id: ${var.existing_cluster_id}
+          spark_python_task:
+            python_file: ${workspace.file_path}/pyspark/jobs/03_build_curated_taxi_trips.py
+            parameters:
+              - --catalog
+              - ${var.databricks_catalog}
+
+        - task_key: build_enriched
+          depends_on:
+            - task_key: build_curated
+          existing_cluster_id: ${var.existing_cluster_id}
+          spark_python_task:
+            python_file: ${workspace.file_path}/pyspark/jobs/04_build_enriched_daily_revenue.py
+            parameters:
+              - --catalog
+              - ${var.databricks_catalog}

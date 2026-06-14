@@ -1,0 +1,23 @@
+bundle:
+  name: pyspark_lakehouse_pipeline
+
+include:
+  - resources/*.yml
+
+variables:
+  existing_cluster_id:
+    description: Existing Databricks cluster ID used to run the PySpark jobs.
+    default: ""
+  databricks_catalog:
+    description: Optional Unity Catalog name. Leave empty to use the default metastore.
+    default: ""
+  raw_file_landing_path:
+    description: DBFS or Volume path where the downloaded online source file is staged.
+    default: dbfs:/tmp/lakehouse_pipeline/landing/yellow_tripdata_2024-01.parquet
+
+targets:
+  dev:
+    mode: development
+    default: true
+    workspace:
+      profile: jollutharunkumar01@gmail.com

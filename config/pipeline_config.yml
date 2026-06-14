@@ -1,0 +1,16 @@
+source:
+  name: nyc_tlc
+  url: https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2024-01.parquet
+  format: parquet
+
+schemas:
+  raw: raw
+  base: base
+  curated: curated
+  enriched: enriched
+
+tables:
+  raw_taxi_trips: nyc_yellow_taxi_trips
+  base_taxi_trips: taxi_trips
+  curated_taxi_trips: taxi_trips
+  enriched_daily_revenue: daily_taxi_revenue

@@ -14,6 +14,10 @@ clean-targets:
   - target
   - dbt_packages
 
+on-run-start:
+  - "CREATE CATALOG IF NOT EXISTS dbt_project"
+  - "CREATE SCHEMA IF NOT EXISTS dbt_project.enriched"
+
 models:
   taxi_lakehouse:
     enriched:

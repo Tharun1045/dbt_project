@@ -5,6 +5,8 @@
     tags=['taxi_pipeline', 'enriched']
 ) }}
 
+-- depends_on: {{ source('curated', 'taxi_trips') }}
+
 select
     pickup_date,
     payment_type_name,
@@ -17,7 +19,7 @@ select
     sum(total_amount) as total_revenue,
     avg(total_amount) as average_trip_amount,
     current_timestamp() as _enriched_processed_at
-from {{ source('curated', 'taxi_trips') }}
+from `dbt_project`.`curated`.`taxi_trips`
 group by
     pickup_date,
     payment_type_name

@@ -6,14 +6,20 @@ import os
 
 from pyspark.sql.functions import col, current_timestamp, to_date
 
-import _bootstrap  # noqa: F401
+from base_functions.spark_utils import create_schema_if_not_exists, get_spark
+from base_functions.table_names import (
+    BASE_SCHEMA,
+    DEFAULT_CATALOG,
+    base_taxi_trips,
+    raw_taxi_trips,
+)
 
 # COMMAND ----------
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--catalog", default=os.getenv("DATABRICKS_CATALOG", ""))
+    parser.add_argument("--catalog", default=os.getenv("DATABRICKS_CATALOG", DEFAULT_CATALOG))
     args, _unknown = parser.parse_known_args()
     return args
 
@@ -23,17 +29,12 @@ os.environ["DATABRICKS_CATALOG"] = args.catalog
 
 # COMMAND ----------
 
-from lakehouse_pipeline.spark import create_schema_if_not_exists, get_spark
-from lakehouse_pipeline.table_names import BASE_SCHEMA, BASE_TAXI_TRIPS, RAW_TAXI_TRIPS
-
-# COMMAND ----------
-
 
 def main() -> None:
     spark = get_spark("02_build_base_taxi_trips")
-    create_schema_if_not_exists(spark, BASE_SCHEMA)
+    create_schema_if_not_exists(spark, args.catalog, BASE_SCHEMA)
 
-    raw_df = spark.table(RAW_TAXI_TRIPS)
+    raw_df = spark.table(raw_taxi_trips(args.catalog))
 
     base_df = (
         raw_df.select(
@@ -68,10 +69,10 @@ def main() -> None:
         .format("delta")
         .mode("overwrite")
         .option("overwriteSchema", "true")
-        .saveAsTable(BASE_TAXI_TRIPS)
+        .saveAsTable(base_taxi_trips(args.catalog))
     )
 
-    print(f"Wrote {base_df.count()} rows to {BASE_TAXI_TRIPS}")
+    print(f"Wrote {base_df.count()} rows to {base_taxi_trips(args.catalog)}")
 
 
 # COMMAND ----------

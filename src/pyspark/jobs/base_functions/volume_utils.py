@@ -1,20 +1,6 @@
 from pathlib import Path
+
 from pyspark.sql import SparkSession
-
-
-def get_dbutils(spark: SparkSession):
-    try:
-        from pyspark.dbutils import DBUtils
-
-        return DBUtils(spark)
-    except Exception:
-        pass
-
-    try:
-        shell = get_ipython()
-        return shell.user_ns.get("dbutils")
-    except Exception:
-        return None
 
 
 def copy_local_file_to_landing(
@@ -30,6 +16,7 @@ def copy_local_file_to_landing(
         )
 
     if landing_path.startswith("/Volumes/"):
+        create_volume_if_not_exists(spark, landing_path)
         landing_file = Path(landing_path)
         landing_file.parent.mkdir(parents=True, exist_ok=True)
         landing_file.write_bytes(local_file.read_bytes())
@@ -39,3 +26,20 @@ def copy_local_file_to_landing(
         return landing_path
 
     return f"file:{local_file.as_posix()}"
+
+
+def create_volume_if_not_exists(spark: SparkSession, volume_path: str) -> None:
+    parts = volume_path.strip("/").split("/")
+    if len(parts) < 4 or parts[0] != "Volumes":
+        raise ValueError(
+            "Volume path must look like "
+            "/Volumes/<catalog>/<schema>/<volume>/<file_name>."
+        )
+
+    catalog_name = parts[1]
+    schema_name = parts[2]
+    volume_name = parts[3]
+
+    spark.sql(f"CREATE CATALOG IF NOT EXISTS `{catalog_name}`")
+    spark.sql(f"CREATE SCHEMA IF NOT EXISTS `{catalog_name}`.`{schema_name}`")
+    spark.sql(f"CREATE VOLUME IF NOT EXISTS `{catalog_name}`.`{schema_name}`.`{volume_name}`")

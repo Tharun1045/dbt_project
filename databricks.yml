@@ -10,10 +10,10 @@ variables:
     default: ""
   databricks_catalog:
     description: Optional Unity Catalog name. Leave empty to use the default metastore.
-    default: ""
+    default: dbt_project
   raw_file_landing_path:
     description: DBFS or Volume path where the downloaded online source file is staged.
-    default: /Volumes/main/default/landing/yellow_tripdata_2024-01.parquet
+    default: /Volumes/dbt_project/default/landing/yellow_tripdata_2024-01.parquet
 
 targets:
   dev:

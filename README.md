@@ -24,10 +24,10 @@ https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2024-01.parquet
 Run these tasks in order:
 
 ```text
-Task 1: python pyspark/jobs/01_ingest_raw_nyc_taxi.py
-Task 2: python pyspark/jobs/02_build_base_taxi_trips.py
-Task 3: python pyspark/jobs/03_build_curated_taxi_trips.py
-Task 4: python pyspark/jobs/04_build_enriched_daily_revenue.py
+Task 1: python src/pyspark/jobs/01_ingest_raw_nyc_taxi.py
+Task 2: python src/pyspark/jobs/02_build_base_taxi_trips.py
+Task 3: python src/pyspark/jobs/03_build_curated_taxi_trips.py
+Task 4: python src/pyspark/jobs/04_build_enriched_daily_revenue.py
 ```
 
 The project also includes a Databricks Asset Bundle starter:
@@ -48,7 +48,7 @@ raw_file_landing_path
 `raw_file_landing_path` defaults to:
 
 ```text
-/Volumes/main/default/landing/yellow_tripdata_2024-01.parquet
+/Volumes/dbt_project/default/landing/yellow_tripdata_2024-01.parquet
 ```
 
 This project intentionally uses a Unity Catalog Volume path instead of DBFS root.
@@ -67,17 +67,16 @@ databricks.yml
 resources/
   jobs.yml
 src/
-  lakehouse_pipeline/
-    databricks_utils.py
-    spark.py
-    table_names.py
-pyspark/
-  jobs/
-    _bootstrap.py
-    01_ingest_raw_nyc_taxi.py
-    02_build_base_taxi_trips.py
-    03_build_curated_taxi_trips.py
-    04_build_enriched_daily_revenue.py
+  pyspark/
+    jobs/
+      base_functions/
+        spark_utils.py
+        table_names.py
+        volume_utils.py
+      01_ingest_raw_nyc_taxi.py
+      02_build_base_taxi_trips.py
+      03_build_curated_taxi_trips.py
+      04_build_enriched_daily_revenue.py
 ```
 
 ## Databricks Notes
@@ -85,10 +84,10 @@ pyspark/
 The scripts write managed Delta tables:
 
 ```text
-raw.nyc_yellow_taxi_trips
-base.taxi_trips
-curated.taxi_trips
-enriched.daily_taxi_revenue
+dbt_project.raw.nyc_yellow_taxi_trips
+dbt_project.base.taxi_trips
+dbt_project.curated.taxi_trips
+dbt_project.enriched.daily_taxi_revenue
 ```
 
 You can later replace the sample online source with your real source while keeping the same layer structure.

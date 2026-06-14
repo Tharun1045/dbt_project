@@ -6,14 +6,20 @@ import os
 
 from pyspark.sql.functions import avg, col, count, current_timestamp, sum
 
-import _bootstrap  # noqa: F401
+from base_functions.spark_utils import create_schema_if_not_exists, get_spark
+from base_functions.table_names import (
+    DEFAULT_CATALOG,
+    ENRICHED_SCHEMA,
+    curated_taxi_trips,
+    enriched_daily_revenue,
+)
 
 # COMMAND ----------
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--catalog", default=os.getenv("DATABRICKS_CATALOG", ""))
+    parser.add_argument("--catalog", default=os.getenv("DATABRICKS_CATALOG", DEFAULT_CATALOG))
     args, _unknown = parser.parse_known_args()
     return args
 
@@ -23,17 +29,12 @@ os.environ["DATABRICKS_CATALOG"] = args.catalog
 
 # COMMAND ----------
 
-from lakehouse_pipeline.spark import create_schema_if_not_exists, get_spark
-from lakehouse_pipeline.table_names import CURATED_TAXI_TRIPS, ENRICHED_DAILY_REVENUE, ENRICHED_SCHEMA
-
-# COMMAND ----------
-
 
 def main() -> None:
     spark = get_spark("04_build_enriched_daily_revenue")
-    create_schema_if_not_exists(spark, ENRICHED_SCHEMA)
+    create_schema_if_not_exists(spark, args.catalog, ENRICHED_SCHEMA)
 
-    curated_df = spark.table(CURATED_TAXI_TRIPS)
+    curated_df = spark.table(curated_taxi_trips(args.catalog))
 
     enriched_df = (
         curated_df
@@ -57,10 +58,10 @@ def main() -> None:
         .format("delta")
         .mode("overwrite")
         .option("overwriteSchema", "true")
-        .saveAsTable(ENRICHED_DAILY_REVENUE)
+        .saveAsTable(enriched_daily_revenue(args.catalog))
     )
 
-    print(f"Wrote {enriched_df.count()} rows to {ENRICHED_DAILY_REVENUE}")
+    print(f"Wrote {enriched_df.count()} rows to {enriched_daily_revenue(args.catalog)}")
 
 
 # COMMAND ----------

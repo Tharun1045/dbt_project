@@ -6,7 +6,7 @@ resources:
         - task_key: ingest_raw
           existing_cluster_id: ${var.existing_cluster_id}
           spark_python_task:
-            python_file: ${workspace.file_path}/pyspark/jobs/01_ingest_raw_nyc_taxi.py
+            python_file: ${workspace.file_path}/src/pyspark/jobs/01_ingest_raw_nyc_taxi.py
             parameters:
               - --catalog
               - ${var.databricks_catalog}
@@ -18,7 +18,7 @@ resources:
             - task_key: ingest_raw
           existing_cluster_id: ${var.existing_cluster_id}
           spark_python_task:
-            python_file: ${workspace.file_path}/pyspark/jobs/02_build_base_taxi_trips.py
+            python_file: ${workspace.file_path}/src/pyspark/jobs/02_build_base_taxi_trips.py
             parameters:
               - --catalog
               - ${var.databricks_catalog}
@@ -28,7 +28,7 @@ resources:
             - task_key: build_base
           existing_cluster_id: ${var.existing_cluster_id}
           spark_python_task:
-            python_file: ${workspace.file_path}/pyspark/jobs/03_build_curated_taxi_trips.py
+            python_file: ${workspace.file_path}/src/pyspark/jobs/03_build_curated_taxi_trips.py
             parameters:
               - --catalog
               - ${var.databricks_catalog}
@@ -38,7 +38,7 @@ resources:
             - task_key: build_curated
           existing_cluster_id: ${var.existing_cluster_id}
           spark_python_task:
-            python_file: ${workspace.file_path}/pyspark/jobs/04_build_enriched_daily_revenue.py
+            python_file: ${workspace.file_path}/src/pyspark/jobs/04_build_enriched_daily_revenue.py
             parameters:
               - --catalog
               - ${var.databricks_catalog}

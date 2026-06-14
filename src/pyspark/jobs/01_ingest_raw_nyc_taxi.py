@@ -8,19 +8,28 @@ from urllib.request import urlretrieve
 
 from pyspark.sql.functions import current_timestamp, lit
 
-import _bootstrap  # noqa: F401
+from base_functions.spark_utils import create_schema_if_not_exists, get_spark
+from base_functions.table_names import (
+    DEFAULT_CATALOG,
+    DEFAULT_RAW_FILE_LANDING_PATH,
+    RAW_SCHEMA,
+    SOURCE_SYSTEM,
+    SOURCE_URL,
+    raw_taxi_trips,
+)
+from base_functions.volume_utils import copy_local_file_to_landing
 
 # COMMAND ----------
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--catalog", default=os.getenv("DATABRICKS_CATALOG", ""))
+    parser.add_argument("--catalog", default=os.getenv("DATABRICKS_CATALOG", DEFAULT_CATALOG))
     parser.add_argument(
         "--raw-file-landing-path",
         default=os.getenv(
             "RAW_FILE_LANDING_PATH",
-            "/Volumes/main/default/landing/yellow_tripdata_2024-01.parquet",
+            DEFAULT_RAW_FILE_LANDING_PATH,
         ),
     )
     args, _unknown = parser.parse_known_args()
@@ -33,22 +42,10 @@ os.environ["RAW_FILE_LANDING_PATH"] = args.raw_file_landing_path
 
 # COMMAND ----------
 
-from lakehouse_pipeline.databricks_utils import copy_local_file_to_landing
-from lakehouse_pipeline.spark import create_schema_if_not_exists, get_spark
-from lakehouse_pipeline.table_names import (
-    RAW_FILE_LANDING_PATH,
-    RAW_SCHEMA,
-    RAW_TAXI_TRIPS,
-    SOURCE_SYSTEM,
-    SOURCE_URL,
-)
-
-# COMMAND ----------
-
 
 def main() -> None:
     spark = get_spark("01_ingest_raw_nyc_taxi")
-    create_schema_if_not_exists(spark, RAW_SCHEMA)
+    create_schema_if_not_exists(spark, args.catalog, RAW_SCHEMA)
 
     current_user = spark.sql("select current_user() as user_name").first()["user_name"]
     local_dir = Path(f"/Workspace/Users/{current_user}/lakehouse_pipeline_runtime/landing")
@@ -60,7 +57,7 @@ def main() -> None:
     staged_source_path = copy_local_file_to_landing(
         spark=spark,
         local_file=local_file,
-        landing_path=RAW_FILE_LANDING_PATH,
+        landing_path=args.raw_file_landing_path,
     )
 
     raw_df = (
@@ -77,10 +74,10 @@ def main() -> None:
         .format("delta")
         .mode("overwrite")
         .option("overwriteSchema", "true")
-        .saveAsTable(RAW_TAXI_TRIPS)
+        .saveAsTable(raw_taxi_trips(args.catalog))
     )
 
-    print(f"Wrote {raw_df.count()} rows to {RAW_TAXI_TRIPS}")
+    print(f"Wrote {raw_df.count()} rows to {raw_taxi_trips(args.catalog)}")
 
 
 # COMMAND ----------

@@ -1,3 +1,10 @@
+{{ config(
+    database='dbt_project',
+    schema='enriched',
+    materialized='table',
+    tags=['taxi_pipeline', 'enriched']
+) }}
+
 select
     pickup_date,
     payment_type_name,

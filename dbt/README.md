@@ -20,7 +20,7 @@ From the repository root:
 
 ```bash
 dbt deps --project-dir dbt
-dbt build --project-dir dbt --select tag:enriched
+dbt build --project-dir dbt --select tag:taxi_pipeline
 ```
 
 Use `profiles.yml.example` as the template for your local or Databricks dbt profile.

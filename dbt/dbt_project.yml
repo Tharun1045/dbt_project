@@ -17,6 +17,9 @@ clean-targets:
 models:
   taxi_lakehouse:
     enriched:
+      +database: dbt_project
+      +schema: enriched
       +materialized: table
       +tags:
         - enriched
+        - taxi_pipeline

@@ -27,7 +27,7 @@ Run these tasks in order:
 Task 1: python src/pyspark/jobs/01_ingest_raw_nyc_taxi.py
 Task 2: python src/pyspark/jobs/02_build_base_taxi_trips.py
 Task 3: python src/pyspark/jobs/03_build_curated_taxi_trips.py
-Task 4: dbt build --project-dir dbt --select tag:enriched
+Task 4: dbt build --project-dir dbt --select tag:taxi_pipeline
 ```
 
 The old PySpark enriched job remains in the repo as a fallback, but the intended enriched layer is now dbt:

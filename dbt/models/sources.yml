@@ -2,7 +2,7 @@ version: 2
 
 sources:
   - name: curated
-    database: "{{ target.catalog }}"
+    database: dbt_project
     schema: curated
     description: Curated layer tables produced by the PySpark pipeline.
     tables:

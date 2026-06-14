@@ -14,7 +14,8 @@ import _bootstrap  # noqa: F401
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--catalog", default=os.getenv("DATABRICKS_CATALOG", ""))
-    return parser.parse_args()
+    args, _unknown = parser.parse_known_args()
+    return args
 
 
 args = parse_args()

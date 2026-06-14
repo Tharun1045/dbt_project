@@ -23,7 +23,8 @@ def parse_args() -> argparse.Namespace:
             "dbfs:/tmp/lakehouse_pipeline/landing/yellow_tripdata_2024-01.parquet",
         ),
     )
-    return parser.parse_args()
+    args, _unknown = parser.parse_known_args()
+    return args
 
 
 args = parse_args()

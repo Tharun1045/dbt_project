@@ -50,7 +50,8 @@ def main() -> None:
     spark = get_spark("01_ingest_raw_nyc_taxi")
     create_schema_if_not_exists(spark, RAW_SCHEMA)
 
-    local_dir = Path("/tmp/lakehouse_pipeline/landing")
+    current_user = spark.sql("select current_user() as user_name").first()["user_name"]
+    local_dir = Path(f"/Workspace/Users/{current_user}/lakehouse_pipeline_runtime/landing")
     local_dir.mkdir(parents=True, exist_ok=True)
     local_file = local_dir / "yellow_tripdata_2024-01.parquet"
 

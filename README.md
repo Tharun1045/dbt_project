@@ -30,6 +30,12 @@ Task 3: python src/pyspark/jobs/03_build_curated_taxi_trips.py
 Task 4: dbt build --project-dir dbt --select tag:taxi_pipeline
 ```
 
+The enriched layer should run through dbt. You can ignore the old PySpark enriched reference file:
+
+```text
+src/pyspark/jobs/04_build_enriched_daily_revenue.py
+```
+
 The old PySpark enriched job remains in the repo as a fallback, but the intended enriched layer is now dbt:
 
 ```text
@@ -41,6 +47,12 @@ The project also includes a Databricks Asset Bundle starter:
 ```text
 databricks.yml
 resources/jobs.yml
+```
+
+For a general explanation of dbt, its folder structure, commands, and Databricks Asset Bundle usage, see:
+
+```text
+docs/dbt_overview.md
 ```
 
 Before deploying the bundle, update these variables:
@@ -69,6 +81,8 @@ If your catalog, schema, or volume names are different, change the path to:
 ```text
 config/
   pipeline_config.yml
+docs/
+  dbt_overview.md
 databricks.yml
 resources/
   jobs.yml
@@ -94,7 +108,7 @@ src/
       01_ingest_raw_nyc_taxi.py
       02_build_base_taxi_trips.py
       03_build_curated_taxi_trips.py
-      04_build_enriched_daily_revenue.py
+      04_build_enriched_daily_revenue.py  # disabled reference; dbt owns enriched
 ```
 
 ## Databricks Notes

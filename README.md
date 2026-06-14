@@ -77,6 +77,8 @@ dbt/
   dbt_project.yml
   profiles.yml.example
   requirements.txt
+  macros/
+    generate_schema_name.sql
   models/
     sources.yml
     enriched/

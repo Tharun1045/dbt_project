@@ -1,6 +1,4 @@
 from pathlib import Path
-from typing import Optional
-
 from pyspark.sql import SparkSession
 
 
@@ -27,12 +25,22 @@ def copy_local_file_to_landing(
     if landing_path.startswith("dbfs:/"):
         dbutils = get_dbutils(spark)
         if dbutils is None:
-            raise RuntimeError("dbutils is required to copy local files to dbfs:/ paths.")
+            print("dbutils is not available. Reading directly from the local downloaded file.")
+            return f"file:{local_file.as_posix()}"
 
         landing_dir = landing_path.rsplit("/", 1)[0]
-        dbutils.fs.mkdirs(landing_dir)
-        dbutils.fs.cp(f"file:{local_file.as_posix()}", landing_path, True)
-        return landing_path
+        try:
+            dbutils.fs.mkdirs(landing_dir)
+            dbutils.fs.cp(f"file:{local_file.as_posix()}", landing_path, True)
+            return landing_path
+        except Exception as exc:
+            if "DBFS_DISABLED" in str(exc) or "Public DBFS root is disabled" in str(exc):
+                print(
+                    "Public DBFS root is disabled. "
+                    "Reading directly from the local downloaded file instead."
+                )
+                return f"file:{local_file.as_posix()}"
+            raise
 
     if landing_path.startswith("/Volumes/"):
         landing_file = Path(landing_path)

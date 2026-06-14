@@ -13,7 +13,7 @@ variables:
     default: ""
   raw_file_landing_path:
     description: DBFS or Volume path where the downloaded online source file is staged.
-    default: dbfs:/tmp/lakehouse_pipeline/landing/yellow_tripdata_2024-01.parquet
+    default: /Volumes/main/default/landing/yellow_tripdata_2024-01.parquet
 
 targets:
   dev:

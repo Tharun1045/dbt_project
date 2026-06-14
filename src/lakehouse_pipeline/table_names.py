@@ -24,5 +24,5 @@ SOURCE_SYSTEM = "nyc_tlc"
 SOURCE_URL = "https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2024-01.parquet"
 RAW_FILE_LANDING_PATH = os.getenv(
     "RAW_FILE_LANDING_PATH",
-    "dbfs:/tmp/lakehouse_pipeline/landing/yellow_tripdata_2024-01.parquet",
+    "/Volumes/main/default/landing/yellow_tripdata_2024-01.parquet",
 )

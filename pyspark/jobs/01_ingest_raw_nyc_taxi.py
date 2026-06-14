@@ -6,7 +6,7 @@ import os
 from pathlib import Path
 from urllib.request import urlretrieve
 
-from pyspark.sql.functions import current_timestamp, input_file_name, lit
+from pyspark.sql.functions import current_timestamp, lit
 
 import _bootstrap  # noqa: F401
 
@@ -20,7 +20,7 @@ def parse_args() -> argparse.Namespace:
         "--raw-file-landing-path",
         default=os.getenv(
             "RAW_FILE_LANDING_PATH",
-            "dbfs:/tmp/lakehouse_pipeline/landing/yellow_tripdata_2024-01.parquet",
+            "/Volumes/main/default/landing/yellow_tripdata_2024-01.parquet",
         ),
     )
     args, _unknown = parser.parse_known_args()
@@ -67,7 +67,7 @@ def main() -> None:
         spark.read
         .format("parquet")
         .load(staged_source_path)
-        .withColumn("_source_file", input_file_name())
+        .withColumn("_source_file", lit(staged_source_path))
         .withColumn("_source_system", lit(SOURCE_SYSTEM))
         .withColumn("_ingested_at", current_timestamp())
     )

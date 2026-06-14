@@ -48,13 +48,14 @@ raw_file_landing_path
 `raw_file_landing_path` defaults to:
 
 ```text
-dbfs:/tmp/lakehouse_pipeline/landing/yellow_tripdata_2024-01.parquet
+/Volumes/main/default/landing/yellow_tripdata_2024-01.parquet
 ```
 
-If your workspace blocks DBFS root, use a Unity Catalog Volume path instead, for example:
+This project intentionally uses a Unity Catalog Volume path instead of DBFS root.
+If your catalog, schema, or volume names are different, change the path to:
 
 ```text
-/Volumes/main/default/landing/yellow_tripdata_2024-01.parquet
+/Volumes/<catalog>/<schema>/<volume>/yellow_tripdata_2024-01.parquet
 ```
 
 ## Project Structure

@@ -23,24 +23,11 @@ def copy_local_file_to_landing(
     landing_path: str,
 ) -> str:
     if landing_path.startswith("dbfs:/"):
-        dbutils = get_dbutils(spark)
-        if dbutils is None:
-            print("dbutils is not available. Reading directly from the local downloaded file.")
-            return f"file:{local_file.as_posix()}"
-
-        landing_dir = landing_path.rsplit("/", 1)[0]
-        try:
-            dbutils.fs.mkdirs(landing_dir)
-            dbutils.fs.cp(f"file:{local_file.as_posix()}", landing_path, True)
-            return landing_path
-        except Exception as exc:
-            if "DBFS_DISABLED" in str(exc) or "Public DBFS root is disabled" in str(exc):
-                print(
-                    "Public DBFS root is disabled. "
-                    "Reading directly from the local downloaded file instead."
-                )
-                return f"file:{local_file.as_posix()}"
-            raise
+        raise ValueError(
+            "DBFS root paths are disabled for this project. "
+            "Use a Unity Catalog Volume path like "
+            "/Volumes/<catalog>/<schema>/<volume>/yellow_tripdata_2024-01.parquet."
+        )
 
     if landing_path.startswith("/Volumes/"):
         landing_file = Path(landing_path)

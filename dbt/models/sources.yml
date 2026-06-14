@@ -1,0 +1,20 @@
+version: 2
+
+sources:
+  - name: curated
+    database: "{{ target.catalog }}"
+    schema: curated
+    description: Curated layer tables produced by the PySpark pipeline.
+    tables:
+      - name: taxi_trips
+        description: Curated trip-level taxi records from PySpark.
+        columns:
+          - name: pickup_date
+            tests:
+              - not_null
+          - name: payment_type_name
+            tests:
+              - not_null
+          - name: total_amount
+            tests:
+              - not_null

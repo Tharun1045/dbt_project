@@ -1,0 +1,18 @@
+version: 2
+
+models:
+  - name: daily_taxi_revenue
+    description: Gold/enriched daily taxi revenue KPI table created by dbt from the curated PySpark layer.
+    columns:
+      - name: pickup_date
+        tests:
+          - not_null
+      - name: payment_type_name
+        tests:
+          - not_null
+      - name: trip_count
+        tests:
+          - not_null
+      - name: total_revenue
+        tests:
+          - not_null

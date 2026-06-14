@@ -1,6 +1,6 @@
-# PySpark Lakehouse Pipeline
+# PySpark + dbt Lakehouse Pipeline
 
-This is an initial PySpark-only project for a four-layer data pipeline:
+This is a hybrid PySpark and dbt project for a four-layer data pipeline:
 
 ```text
 online source -> raw -> base -> curated -> enriched
@@ -17,7 +17,7 @@ https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2024-01.parquet
 - `raw`: ingest source data as-is, with technical metadata
 - `base`: standardize names, types, and basic validity rules
 - `curated`: apply business-friendly rules and create trusted entities
-- `enriched`: create reporting-ready KPIs and aggregates
+- `enriched`: create reporting-ready KPIs and aggregates with dbt
 
 ## Suggested Databricks Workflow
 
@@ -27,7 +27,13 @@ Run these tasks in order:
 Task 1: python src/pyspark/jobs/01_ingest_raw_nyc_taxi.py
 Task 2: python src/pyspark/jobs/02_build_base_taxi_trips.py
 Task 3: python src/pyspark/jobs/03_build_curated_taxi_trips.py
-Task 4: python src/pyspark/jobs/04_build_enriched_daily_revenue.py
+Task 4: dbt build --project-dir dbt --select tag:enriched
+```
+
+The old PySpark enriched job remains in the repo as a fallback, but the intended enriched layer is now dbt:
+
+```text
+src/pyspark/jobs/04_build_enriched_daily_revenue.py
 ```
 
 The project also includes a Databricks Asset Bundle starter:
@@ -66,6 +72,16 @@ config/
 databricks.yml
 resources/
   jobs.yml
+dbt/
+  README.md
+  dbt_project.yml
+  profiles.yml.example
+  requirements.txt
+  models/
+    sources.yml
+    enriched/
+      daily_taxi_revenue.sql
+      schema.yml
 src/
   pyspark/
     jobs/
@@ -81,12 +97,17 @@ src/
 
 ## Databricks Notes
 
-The scripts write managed Delta tables:
+The PySpark scripts write these managed Delta tables:
 
 ```text
 dbt_project.raw.nyc_yellow_taxi_trips
 dbt_project.base.taxi_trips
 dbt_project.curated.taxi_trips
+```
+
+dbt writes the enriched Gold table:
+
+```text
 dbt_project.enriched.daily_taxi_revenue
 ```
 

@@ -1,0 +1,11 @@
+taxi_lakehouse:
+  target: dev
+  outputs:
+    dev:
+      type: databricks
+      catalog: dbt_project
+      schema: enriched
+      host: <your-databricks-workspace-host>
+      http_path: <your-sql-warehouse-http-path>
+      token: <your-databricks-token>
+      threads: 4
